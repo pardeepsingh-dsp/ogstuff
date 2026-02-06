@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warning: Excessive Rizz Detected 😎</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. Background & Layout --- */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- 2. The Typewriter Text (Intro) --- */
+        #typing-container {
+            position: absolute;
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through */
+        }
+
+        /* --- 3. The Glass Card --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            
+            opacity: 0; 
+            transform: translateY(30px);
+            transition: all 1.5s ease;
+            display: none;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            margin-top: 0;
+        }
+
+        /* --- 4. The Buttons --- */
+        .btn-container {
+            position: relative;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            font-family: 'Nunito', sans-serif;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        .btn-yes {
+            background: #fff;
+            color: #ff6b81;
+        }
+        
+        .btn-yes:hover {
+            transform: scale(1.1);
+            background: #ffe5e9;
+        }
+
+        .btn-no {
+            background: #ff6b81;
+            color: white;
+            z-index: 5;
+        }
+
+        /* --- 5. Success State --- */
+        .gif-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .gif-container img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="typing-container"></div>
+
+    <div class="glass-card" id="main-card">
+        <h1>Since we both clearly like good food, want to be my Valentine and grab a bite on the 14th?</h1>
+        
+        <div class="btn-container">
+            <button class="btn-yes" onclick="sayYes()">YES!</button>
+            <button class="btn-no" id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No</button>
+        </div>
+
+        <div class="gif-container" id="gif-container">
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW5ueHc2a2ExNmJ2NDdhYmwzazlocGFiY2RuZTc2aHB1YzE0ajhlNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KZDwzaTX4CcGQ/giphy.gif" alt="Success Gif">
+            <h2 style="color: white; font-family: 'Dancing Script'; font-size: 2.5rem;">Best. Decision. Ever. ❤️</h2>
+        </div>
+    </div>
+
+    <canvas id="confetti" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; display: none;"></canvas>
+
+    <script>
+        // --- CONFIGURATION ---
+        const phrase1 = "Hi <Name of your FS>...";
+        const phrase2 = "I was planning to protest Valentine's Day this year, but then I met you and you ruined my whole 'grumpy single guy' plan....";
+        
+        const typingSpeed = 100;
+        const pauseBetweenPhrases = 1500;
+        
+        const typingElement = document.getElementById('typing-container');
+        const cardElement = document.getElementById('main-card');
+
+        // --- 1. Typing Logic ---
+        function typeText(text, callback) {
+            typingElement.innerHTML = "";
+            typingElement.style.opacity = 1;
+            typingElement.style.display = "block";
+            let i = 0;
+            
+            function nextChar() {
+                if (i < text.length) {
+                    typingElement.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(nextChar, typingSpeed);
+                } else {
+                    setTimeout(() => {
+                        typingElement.style.transition = "opacity 1s ease";
+                        typingElement.style.opacity = 0;
+                        setTimeout(callback, 1000);
+                    }, pauseBetweenPhrases);
+                }
+            }
+            nextChar();
+        }
+
+        function startSequence() {
+            typeText(phrase1, () => {
+                typeText(phrase2, () => {
+                    typingElement.style.display = 'none';
+                    cardElement.style.display = 'block';
+                    setTimeout(() => {
+                        cardElement.style.opacity = '1';
+                        cardElement.style.transform = 'translateY(0)';
+                    }, 50);
+                });
+            });
+        }
+
+        window.onload = startSequence;
+
+
+        // --- 2. The "No" Button Logic (Fixed for Bounds) ---
+        const noBtn = document.getElementById('noBtn');
+        const texts = ["Are you sure?", "Think again!", "404 Error", "Try the other one", "no can dosville!", "Can't catch me"];
+        let textIndex = 0;
+        
+        function moveButton() {
+            // [CRITICAL FIX] 
+            // We move the button to the document body. 
+            // This allows it to escape the "transform" context of the card
+            // so 'position: fixed' works relative to the actual screen again.
+            if (noBtn.parentNode !== document.body) {
+                document.body.appendChild(noBtn);
+            }
+
+            // 1. Change text FIRST so the button resizes
+            const nextText = texts[textIndex];
+            noBtn.innerText = nextText;
+            textIndex = (textIndex + 1) % texts.length;
+
+            // 2. Get the NEW dimensions
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.zIndex = '1000'; 
+
+            // 3. Calculate boundaries
+            const safeMargin = 20;
+            const maxX = window.innerWidth - btnWidth - safeMargin;
+            const maxY = window.innerHeight - btnHeight - safeMargin;
+
+            const randomX = Math.random() * (maxX - safeMargin) + safeMargin;
+            const randomY = Math.random() * (maxY - safeMargin) + safeMargin;
+
+            // 4. Apply new coordinates
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
+        }
+
+
+        // --- 3. The "Yes" Action ---
+        function sayYes() {
+            document.querySelector('h1').style.display = 'none';
+            document.querySelector('.btn-container').style.display = 'none';
+            
+            // --- NEW LINE ---
+            // Explicitly hide the No button since it's now attached to the body
+            document.getElementById('noBtn').style.display = 'none'; 
+            // ----------------
+
+            document.getElementById('gif-container').style.display = 'flex';
+            startConfetti();
+        }
+
+        // --- 4. Confetti Engine ---
+        function startConfetti() {
+            const canvas = document.getElementById('confetti');
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const colors = ['#ff9a9e', '#fad0c4', '#a18cd1', '#ffffff'];
+
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 10 + 5,
+                    speed: Math.random() * 5 + 2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    if (p.y > canvas.height) p.y = -10;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
